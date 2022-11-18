@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.StaticFiles;
 using Serilog;
+using FirstApiCreated.Services; 
 
 // SeriLog Configuration 
 Log.Logger = new LoggerConfiguration()
@@ -12,9 +13,17 @@ var builder = WebApplication.CreateBuilder(args);
 // for the add console no problem with them , they won't be used even !! 
 builder.Logging.AddConsole();
 // we have to tell Asp.Net to use Serilog instead of the built in Logger !! 
-builder.Host.UseSerilog();  
 
+builder.Host.UseSerilog();
 // Add services to the container.
+// we overloaded the AddTranscient , each time we inject the interface , the container has to create an instance of the localmailservice ! 
+// CAN YOU BELIEVE WHAT WE HAVE ALREADY DONE  !!! 
+#if DEBUG  
+builder.Services.AddTransient<IMailService,localMailService>();
+#else
+builder.Services.AddTransient<IMailService,CloudMailService>();
+#endif
+
 
 builder.Services.AddControllers(option =>
 {

@@ -1,6 +1,7 @@
 ﻿using FirstApiCreated.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using FirstApiCreated.Services; 
 
 namespace FirstApiCreated.Controllers
 {
@@ -9,18 +10,22 @@ namespace FirstApiCreated.Controllers
     public class PointsOfInterestController : ControllerBase
     {
         // we will be injecting the ILOGGER service in Our controller ! 
+        // injecting the mail service !! 
         private readonly ILogger<PointsOfInterestController> _logger;
-        public PointsOfInterestController(ILogger<PointsOfInterestController> logger)
+        private readonly IMailService _mailSerive; 
+
+        public PointsOfInterestController(ILogger<PointsOfInterestController> logger, IMailService mailSerive)
         {
             //the dependancy injection pattern ! 
             // let's give more control about our dependancy 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mailSerive = mailSerive;
             // we can request service from the container directly as : 
-          //   HttpContext.RequestServices.GetService(ILogger<PointsOfInterestController>); 
+            //   HttpContext.RequestServices.GetService(ILogger<PointsOfInterestController>); 
         }
 
 
-            [HttpGet]
+        [HttpGet]
         public ActionResult<IEnumerable<pointsOfInterestDto>> getPoints (int cityId)
         {
             var result = citiesDataStore.current.cities.FirstOrDefault(ptr => ptr.Id == cityId);
@@ -32,7 +37,7 @@ namespace FirstApiCreated.Controllers
         {
             try
             {
-                throw new Exception("I create this exception");
+              //  throw new Exception("I create this exception");
                 var result = citiesDataStore.current.cities.FirstOrDefault(ptr => ptr.Id == cityId);
                 if (result == null)
                 {
@@ -104,6 +109,7 @@ namespace FirstApiCreated.Controllers
                 return NoContent();
 
             }
+        // we will try our mail service here 
         [HttpDelete("{pointofinterestid}")]
         public ActionResult deletePointOfInterest ( int cityid , int pointofinterestid )
         {
@@ -114,6 +120,7 @@ namespace FirstApiCreated.Controllers
             if (checkpointofinterest == null) { return NotFound(); }
 
             checkcity.PointsofInterest.Remove(checkpointofinterest);
+            _mailSerive.Send("point of interest deleted ", $"point of interest {checkpointofinterest.Name} was deleted with id {checkpointofinterest.Id}");
             return NoContent(); 
 
         }
