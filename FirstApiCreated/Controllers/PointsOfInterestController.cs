@@ -8,7 +8,19 @@ namespace FirstApiCreated.Controllers
     [ApiController]
     public class PointsOfInterestController : ControllerBase
     {
-        [HttpGet]
+        // we will be injecting the ILOGGER service in Our controller ! 
+        private readonly ILogger<PointsOfInterestController> _logger;
+        public PointsOfInterestController(ILogger<PointsOfInterestController> logger)
+        {
+            //the dependancy injection pattern ! 
+            // let's give more control about our dependancy 
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            // we can request service from the container directly as : 
+          //   HttpContext.RequestServices.GetService(ILogger<PointsOfInterestController>); 
+        }
+
+
+            [HttpGet]
         public ActionResult<IEnumerable<pointsOfInterestDto>> getPoints (int cityId)
         {
             var result = citiesDataStore.current.cities.FirstOrDefault(ptr => ptr.Id == cityId);
@@ -18,12 +30,29 @@ namespace FirstApiCreated.Controllers
         [HttpGet("{pointofinterestid}",Name ="get")]
         public ActionResult<pointsOfInterestDto> getPointsOfInterestId ( int cityId , int pointofinterestid)
         {
-            var result = citiesDataStore.current.cities.FirstOrDefault(ptr => ptr.Id == cityId);
-            if (result == null) { return NotFound(); };
+            try
+            {
+                throw new Exception("I create this exception");
+                var result = citiesDataStore.current.cities.FirstOrDefault(ptr => ptr.Id == cityId);
+                if (result == null)
+                {
+                    _logger.LogInformation($"City with {cityId} wasn't found when accessing points of Interest");
+                    return NotFound();
 
-            var city = result.PointsofInterest.FirstOrDefault(ptr => ptr.Id == pointofinterestid);  
-            if (city ==null) { return NotFound();  };
-            return Ok(city);
+                };
+                var city = result.PointsofInterest.FirstOrDefault(ptr => ptr.Id == pointofinterestid);
+                if (city == null) { return NotFound(); };
+                return Ok(city);
+
+            }
+            catch ( Exception ex )  
+            {
+                _logger.LogCritical($"Exception while getting points of Interests of for city with id {cityId}", ex); 
+                return StatusCode(500,"error while handling the request");
+            }
+
+
+         
         }
         [HttpPost]
         public ActionResult<pointsOfInterestDto> createPointOfInterest(int cityid , pointsOfInterestForCreationDto newpointofinterest)
