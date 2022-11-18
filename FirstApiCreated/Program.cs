@@ -1,8 +1,18 @@
 using Microsoft.AspNetCore.StaticFiles;
+using Serilog;
 
+// SeriLog Configuration 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.File("logs/cityinfoLog.txt",rollingInterval : RollingInterval.Day)
+    .CreateLogger();    
+// we finishedthe serilog minimum level configuration !! 
 var builder = WebApplication.CreateBuilder(args);
+// for the add console no problem with them , they won't be used even !! 
 builder.Logging.AddConsole();
-
+// we have to tell Asp.Net to use Serilog instead of the built in Logger !! 
+builder.Host.UseSerilog();  
 
 // Add services to the container.
 
