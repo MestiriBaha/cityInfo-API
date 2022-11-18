@@ -6,7 +6,7 @@ namespace FirstApiCreated
     {
         public List<cityDto> cities { get; set; } 
 
-        public static citiesDataStore current { get; }   = new citiesDataStore(); 
+        //public static citiesDataStore current { get; }   = new citiesDataStore(); 
        public citiesDataStore()
         {
             cities = new List<cityDto>() { new cityDto() { Id = 1, Name = "Sousse", Description = "La perle du sahel", PointsofInterest = new List<pointsOfInterestDto>()

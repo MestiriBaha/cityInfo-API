@@ -13,14 +13,16 @@ namespace FirstApiCreated.Controllers
         // injecting the mail service !! 
         private readonly ILogger<PointsOfInterestController> _logger;
         private readonly IMailService _mailSerive; 
+        private readonly citiesDataStore _citiesDataStore; 
 
-        public PointsOfInterestController(ILogger<PointsOfInterestController> logger, IMailService mailSerive)
+        public PointsOfInterestController(ILogger<PointsOfInterestController> logger, IMailService mailSerive, citiesDataStore citiesDataStore)
         {
             //the dependancy injection pattern ! 
             // let's give more control about our dependancy 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mailSerive = mailSerive;
-            // we can request service from the container directly as : 
+            _citiesDataStore = citiesDataStore;
+                // we can request service from the container directly as : 
             //   HttpContext.RequestServices.GetService(ILogger<PointsOfInterestController>); 
         }
 
@@ -28,7 +30,7 @@ namespace FirstApiCreated.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<pointsOfInterestDto>> getPoints (int cityId)
         {
-            var result = citiesDataStore.current.cities.FirstOrDefault(ptr => ptr.Id == cityId);
+            var result = _citiesDataStore.cities.FirstOrDefault(ptr => ptr.Id == cityId);
             if ( result == null ) { return NotFound(); };
             return Ok(result.points); 
         }
@@ -38,7 +40,7 @@ namespace FirstApiCreated.Controllers
             try
             {
               //  throw new Exception("I create this exception");
-                var result = citiesDataStore.current.cities.FirstOrDefault(ptr => ptr.Id == cityId);
+                var result = _citiesDataStore.cities.FirstOrDefault(ptr => ptr.Id == cityId);
                 if (result == null)
                 {
                     _logger.LogInformation($"City with {cityId} wasn't found when accessing points of Interest");
@@ -62,10 +64,10 @@ namespace FirstApiCreated.Controllers
         [HttpPost]
         public ActionResult<pointsOfInterestDto> createPointOfInterest(int cityid , pointsOfInterestForCreationDto newpointofinterest)
         {
-            var checkcity = citiesDataStore.current.cities.FirstOrDefault(t => t.Id == cityid);
+            var checkcity = _citiesDataStore.cities.FirstOrDefault(t => t.Id == cityid);
             if (checkcity==null) {  return NotFound(); } 
             // searching for the max id in the pointsofinterest !! 
-            var nextId = citiesDataStore.current.cities.SelectMany(c => c.PointsofInterest).Max(p => p.Id);
+            var nextId =_citiesDataStore.cities.SelectMany(c => c.PointsofInterest).Max(p => p.Id);
             var finalPointOfInterest = new pointsOfInterestDto()
             {
                 Id = ++nextId,
@@ -78,7 +80,7 @@ namespace FirstApiCreated.Controllers
         [HttpPut("{pointOfInterestId}")]
         public ActionResult updatePointOfInterest ( int cityid , int pointOfInterestId , pointsOfInterestForUpdatingDto pointOfInterest)
         {
-            var checkcity = citiesDataStore.current.cities.FirstOrDefault(t => t.Id == cityid);
+            var checkcity = _citiesDataStore.cities.FirstOrDefault(t => t.Id == cityid);
             if (checkcity == null) { return NotFound(); }
             //check point of interest Id
             var checkpointofinterest = checkcity.PointsofInterest.FirstOrDefault( c => c.Id==pointOfInterestId);
@@ -90,7 +92,7 @@ namespace FirstApiCreated.Controllers
         [HttpPatch("{pointofinterestid}")]
         public ActionResult partiallyUpdatePointOfInterest ( int cityid , int pointofinterestid , JsonPatchDocument<pointsOfInterestForUpdatingDto> patchDocument)
         {
-            var checkcity = citiesDataStore.current.cities.FirstOrDefault(t => t.Id == cityid);
+            var checkcity =_citiesDataStore.cities.FirstOrDefault(t => t.Id == cityid);
             if (checkcity == null) { return NotFound(); }
             var checkpointofinterestforpatch = checkcity.PointsofInterest.FirstOrDefault(c => c.Id == pointofinterestid);
             if (checkpointofinterestforpatch == null) { return NotFound(); }
@@ -113,7 +115,7 @@ namespace FirstApiCreated.Controllers
         [HttpDelete("{pointofinterestid}")]
         public ActionResult deletePointOfInterest ( int cityid , int pointofinterestid )
         {
-            var checkcity = citiesDataStore.current.cities.FirstOrDefault(t => t.Id == cityid);
+            var checkcity = _citiesDataStore.cities.FirstOrDefault(t => t.Id == cityid);
             if (checkcity == null) { return NotFound(); }
             //check point of interest Id
             var checkpointofinterest = checkcity.PointsofInterest.FirstOrDefault(c => c.Id == pointofinterestid);

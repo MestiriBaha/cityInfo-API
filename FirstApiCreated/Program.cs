@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.StaticFiles;
 using Serilog;
+using FirstApiCreated;
 using FirstApiCreated.Services; 
 
 // SeriLog Configuration 
@@ -23,6 +24,8 @@ builder.Services.AddTransient<IMailService,localMailService>();
 #else
 builder.Services.AddTransient<IMailService,CloudMailService>();
 #endif
+// implementing the DI principle on the static instance current : 
+builder.Services.AddSingleton <citiesDataStore > ();
 
 
 builder.Services.AddControllers(option =>
