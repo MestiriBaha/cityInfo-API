@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.StaticFiles;
 using Serilog;
 using FirstApiCreated;
-using FirstApiCreated.Services; 
+using FirstApiCreated.Services;
+using FirstApiCreated.Database;
+using Microsoft.EntityFrameworkCore;
 
 // SeriLog Configuration 
 Log.Logger = new LoggerConfiguration()
@@ -26,6 +28,9 @@ builder.Services.AddTransient<IMailService,CloudMailService>();
 #endif
 // implementing the DI principle on the static instance current : 
 builder.Services.AddSingleton <citiesDataStore > ();
+// registring our database with a scope lifetime
+builder.Services.AddDbContext<CityInfoContext>(
+    DbContextOptions =>DbContextOptions.UseSqlite("Data Source = CityInfo.db"));
 
 
 builder.Services.AddControllers(option =>
