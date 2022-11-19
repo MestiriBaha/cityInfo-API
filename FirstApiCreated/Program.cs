@@ -29,8 +29,9 @@ builder.Services.AddTransient<IMailService,CloudMailService>();
 // implementing the DI principle on the static instance current : 
 builder.Services.AddSingleton <citiesDataStore > ();
 // registring our database with a scope lifetime
+//using the app setting configuration file 
 builder.Services.AddDbContext<CityInfoContext>(
-    DbContextOptions =>DbContextOptions.UseSqlite("Data Source = CityInfo.db"));
+    DbContextOptions => DbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings: CityInfoDBConnectionString"]));
 
 
 builder.Services.AddControllers(option =>

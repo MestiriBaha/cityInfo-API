@@ -23,6 +23,6 @@ namespace FirstApiCreated.Entities
         public string? Description { get; set; }
       
    //Many to one Relation !! 
-        public ICollection<pointsOfInterestDto> PointsofInterest { get; set; } = new List<pointsOfInterestDto>();
+        public ICollection<PointOfInterest> PointsofInterest { get; set; } = new List<PointOfInterest>();
     }
 }

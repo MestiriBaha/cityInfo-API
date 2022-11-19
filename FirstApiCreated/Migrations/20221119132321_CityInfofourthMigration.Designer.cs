@@ -2,6 +2,7 @@
 using FirstApiCreated.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FirstApiCreated.Migrations
 {
     [DbContext(typeof(CityInfoContext))]
-    partial class CityInfoContextModelSnapshot : ModelSnapshot
+    [Migration("20221119132321_CityInfofourthMigration")]
+    partial class CityInfofourthMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.0");
@@ -34,26 +36,6 @@ namespace FirstApiCreated.Migrations
                     b.HasKey("CityId");
 
                     b.ToTable("Cities");
-
-                    b.HasData(
-                        new
-                        {
-                            CityId = 1,
-                            Description = "The City where Bouha came from",
-                            Name = "Mahdia"
-                        },
-                        new
-                        {
-                            CityId = 2,
-                            Description = "The City where Boul3ez came from ",
-                            Name = "Tozeur"
-                        },
-                        new
-                        {
-                            CityId = 3,
-                            Description = "The city where the Animal Harry came from",
-                            Name = "Bizete"
-                        });
                 });
 
             modelBuilder.Entity("FirstApiCreated.Entities.PointOfInterest", b =>
@@ -80,29 +62,6 @@ namespace FirstApiCreated.Migrations
                     b.HasIndex("CityId");
 
                     b.ToTable("PointsOfInterest");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CityId = 1,
-                            Description = "Blue lagoon beach",
-                            Name = "The beach"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CityId = 2,
-                            Description = "The most Magical sahara in Africa ",
-                            Name = "Sahara"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CityId = 3,
-                            Description = "wonderful place ",
-                            Name = "Ras jabl"
-                        });
                 });
 
             modelBuilder.Entity("FirstApiCreated.Entities.PointOfInterest", b =>
