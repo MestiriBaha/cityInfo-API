@@ -32,6 +32,8 @@ builder.Services.AddSingleton <citiesDataStore > ();
 //using the app setting configuration file 
 builder.Services.AddDbContext<CityInfoContext>(
     DbContextOptions => DbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings: CityInfoDBConnectionString"]));
+//register the Repository Service with the best practices !! 
+builder.Services.AddScoped<ICityInfoRepository, CityInfoRepository>();
 
 
 builder.Services.AddControllers(option =>
