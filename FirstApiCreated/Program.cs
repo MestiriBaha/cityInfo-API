@@ -31,9 +31,11 @@ builder.Services.AddSingleton <citiesDataStore > ();
 // registring our database with a scope lifetime
 //using the app setting configuration file 
 builder.Services.AddDbContext<CityInfoContext>(
-    DbContextOptions => DbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings: CityInfoDBConnectionString"]));
+    DbContextOptions => DbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings:CityInfoDBConnectionString"]));
 //register the Repository Service with the best practices !! 
 builder.Services.AddScoped<ICityInfoRepository, CityInfoRepository>();
+//register the AutoMap Service 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
 builder.Services.AddControllers(option =>

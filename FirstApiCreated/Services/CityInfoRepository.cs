@@ -10,8 +10,9 @@ namespace FirstApiCreated.Services
         private readonly CityInfoContext _cityInfoContext;
         public CityInfoRepository(CityInfoContext cityinfocontext)
         {
+            // beware of the nullable and the DI implementation
             // when we added the check exception for nullable database , the green error was gone ! 
-            cityinfocontext = _cityInfoContext ?? throw new ArgumentNullException(nameof(cityinfocontext));  
+            _cityInfoContext = cityinfocontext ?? throw new ArgumentNullException(nameof(cityinfocontext));  
         }
        public  async Task<IEnumerable<City>> GetCitiesAsync()
         {
