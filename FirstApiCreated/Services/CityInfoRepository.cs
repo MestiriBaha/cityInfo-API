@@ -43,6 +43,21 @@ namespace FirstApiCreated.Services
         {
             return await _cityInfoContext.Cities.AnyAsync(searching => searching.CityId==cityid);    
         }
+       public  async Task AddPointofinterestforCityAsync(int cityid, PointOfInterest pointofinterestid)
+        {
+            // we need to get the city from  which we have the cityid 
+            var city = await GetCityByIdAsync(cityid, false);
+            if (city != null)
+            {
+                city.PointsofInterest.Add(pointofinterestid);
+            }
+
+        }
+        public async Task<Boolean> Savechangesasync()
+        {
+            return (await _cityInfoContext.SaveChangesAsync() >=0 ); 
+        }
+
         //let's register our service in program.cs class 
     }
 }
