@@ -57,6 +57,13 @@ namespace FirstApiCreated.Services
         {
             return (await _cityInfoContext.SaveChangesAsync() >=0 ); 
         }
+       public  void DeletePointofInterest(PointOfInterest pointOfInterest)
+        {
+            // easy hein ! 
+            _cityInfoContext.PointsOfInterest.Remove(pointOfInterest);  
+        }
+
+
 
         //let's register our service in program.cs class 
     }

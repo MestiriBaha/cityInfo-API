@@ -12,7 +12,9 @@ namespace FirstApiCreated.Services
         Task<Boolean> isCityExist(int cityid);
         //post methods 
         Task AddPointofinterestforCityAsync ( int cityid, PointOfInterest pointofinterestid);
-        Task<Boolean> Savechangesasync(); 
+        Task<Boolean> Savechangesasync();
+        //delete method 
+        void DeletePointofInterest(PointOfInterest pointOfInterest);
 
     }
 }

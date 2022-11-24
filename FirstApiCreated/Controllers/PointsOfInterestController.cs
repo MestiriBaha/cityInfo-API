@@ -117,19 +117,18 @@ namespace FirstApiCreated.Controllers
 
         }
         // we will try our mail service here 
-      /*  [HttpDelete("{pointofinterestid}")]
-        public ActionResult deletePointOfInterest(int cityid, int pointofinterestid)
+        [HttpDelete("{pointofinterestid}")]
+        public async Task<ActionResult> deletePointOfInterest(int cityid, int pointofinterestid)
         {
-            var checkcity = _citiesDataStore.cities.FirstOrDefault(t => t.Id == cityid);
-            if (checkcity == null) { return NotFound(); }
+            var checkcity = await _cityInfoRepository.isCityExist(cityid); 
+            if (!checkcity) { return NotFound(); }
             //check point of interest Id
-            var checkpointofinterest = checkcity.PointsofInterest.FirstOrDefault(c => c.Id == pointofinterestid);
+            var checkpointofinterest =_cityInfoRepository.GetPointOfInterestAsync(cityid,pointofinterestid);
             if (checkpointofinterest == null) { return NotFound(); }
-
-            checkcity.PointsofInterest.Remove(checkpointofinterest);
+            _cityInfoRepository.DeletePointofInterest(checkpointofinterest);
             _mailSerive.Send("point of interest deleted ", $"point of interest {checkpointofinterest.Name} was deleted with id {checkpointofinterest.Id}");
             return NoContent();
 
-        }*/
+        }
     }
 }
