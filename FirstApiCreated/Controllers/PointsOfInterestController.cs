@@ -1,7 +1,8 @@
 ﻿using FirstApiCreated.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using FirstApiCreated.Services; 
+using FirstApiCreated.Services;
+using AutoMapper;
 
 namespace FirstApiCreated.Controllers
 {
@@ -13,55 +14,52 @@ namespace FirstApiCreated.Controllers
         // injecting the mail service !! 
         private readonly ILogger<PointsOfInterestController> _logger;
         private readonly IMailService _mailSerive; 
-        private readonly citiesDataStore _citiesDataStore; 
+        // no more static data 
+       // private readonly citiesDataStore _citiesDataStore;
+        private readonly IMapper _mapper;
+        private readonly ICityInfoRepository _cityInfoRepository ;
 
-        public PointsOfInterestController(ILogger<PointsOfInterestController> logger, IMailService mailSerive, citiesDataStore citiesDataStore)
+        public PointsOfInterestController(ILogger<PointsOfInterestController> logger, IMailService mailSerive, IMapper mapper, ICityInfoRepository cityInfoRepository)
         {
             //the dependancy injection pattern ! 
             // let's give more control about our dependancy 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mailSerive = mailSerive;
-            _citiesDataStore = citiesDataStore;
-                // we can request service from the container directly as : 
+            _mailSerive = mailSerive ?? throw new ArgumentNullException(nameof(mailSerive));    
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+             _cityInfoRepository = cityInfoRepository ?? throw new ArgumentNullException(nameof(cityInfoRepository));
+            // we can request service from the container directly as : 
             //   HttpContext.RequestServices.GetService(ILogger<PointsOfInterestController>); 
         }
 
 
         [HttpGet]
-        public ActionResult<IEnumerable<pointsOfInterestDto>> getPoints (int cityId)
+        public async Task<ActionResult<IEnumerable<pointsOfInterestDto>>> getPoints (int cityId)
         {
-            var result = _citiesDataStore.cities.FirstOrDefault(ptr => ptr.Id == cityId);
-            if ( result == null ) { return NotFound(); };
-            return Ok(result.points); 
+            if (!await _cityInfoRepository.isCityExist(cityId))
+            {
+                _logger.LogInformation($"City with {cityId} wasn't found when accessing points of Interest");
+                return NotFound();
+            }
+            var result = await _cityInfoRepository.GetPointsOfInterestForCityAsync(cityId);
+            return Ok(_mapper.Map<IEnumerable<pointsOfInterestDto>>(result)) ;
         }
         [HttpGet("{pointofinterestid}",Name ="get")]
-        public ActionResult<pointsOfInterestDto> getPointsOfInterestId ( int cityId , int pointofinterestid)
+        public async Task<ActionResult<pointsOfInterestDto>> getPointsOfInterestId ( int cityId , int pointofinterestid)
         {
-            try
-            {
-              //  throw new Exception("I create this exception");
-                var result = _citiesDataStore.cities.FirstOrDefault(ptr => ptr.Id == cityId);
-                if (result == null)
+                           
+                if (!await _cityInfoRepository.isCityExist(cityId))
                 {
                     _logger.LogInformation($"City with {cityId} wasn't found when accessing points of Interest");
                     return NotFound();
 
                 };
-                var city = result.PointsofInterest.FirstOrDefault(ptr => ptr.Id == pointofinterestid);
-                if (city == null) { return NotFound(); };
-                return Ok(city);
+                var result = await _cityInfoRepository.GetPointOfInterestAsync(cityId, pointofinterestid);    
+            if (result==null) { return NotFound(); }
+                return Ok(_mapper.Map<pointsOfInterestDto>(result));
 
             }
-            catch ( Exception ex )  
-            {
-                _logger.LogCritical($"Exception while getting points of Interests of for city with id {cityId}", ex); 
-                return StatusCode(500,"error while handling the request");
-            }
-
-
-         
         }
-        [HttpPost]
+       /* [HttpPost]
         public ActionResult<pointsOfInterestDto> createPointOfInterest(int cityid , pointsOfInterestForCreationDto newpointofinterest)
         {
             var checkcity = _citiesDataStore.cities.FirstOrDefault(t => t.Id == cityid);
@@ -126,5 +124,5 @@ namespace FirstApiCreated.Controllers
             return NoContent(); 
 
         }
-        }
+        }*/
 }

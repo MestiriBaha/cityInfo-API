@@ -37,7 +37,7 @@ namespace FirstApiCreated.Controllers
         {
            var result = await _cityInfoRepository.GetCityByIdAsync(id , isPointofinterestincluded);
             if ( result == null) { return NotFound(); }
-            if (isPointofinterestincluded)
+            if (isPointofinterestincluded==false)
             {
                 return Ok(_mapper.Map<CityWithoutPointOfInterestDTO>(result));  
             }

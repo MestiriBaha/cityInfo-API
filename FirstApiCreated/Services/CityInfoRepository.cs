@@ -19,12 +19,12 @@ namespace FirstApiCreated.Services
             // throw new NotImplementedException();    
             return await _cityInfoContext.Cities.OrderBy(rank => rank.Name).ToListAsync(); 
         }
-        public async Task<City?> GetCityByIdAsync(int cityid, bool IsPointofinterestincluded)
+        public async Task<City?> GetCityByIdAsync(int cityid, Boolean IsPointofinterestincluded)
         {
             //throw new NotImplementedException();
             if (IsPointofinterestincluded)
             {
-                return await _cityInfoContext.Cities.Include("PointOfInterest").Where(search => search.CityId==cityid).FirstOrDefaultAsync();
+                return await _cityInfoContext.Cities.Include(x=> x.PointsofInterest).Where(search => search.CityId==cityid).FirstOrDefaultAsync();
             }
             return await _cityInfoContext.Cities.Where(search => search.CityId == cityid).FirstOrDefaultAsync();
         }
@@ -37,6 +37,11 @@ namespace FirstApiCreated.Services
         {
             //throw new NotImplementedException();
             return await _cityInfoContext.PointsOfInterest.Where(search => search.CityId == cityid && search.Id == pointofinterestid).FirstOrDefaultAsync();
+        }
+        //method to check if a city exists ( needed for searching points of interest ) 
+        public async Task<Boolean> isCityExist ( int cityid)
+        {
+            return await _cityInfoContext.Cities.AnyAsync(searching => searching.CityId==cityid);    
         }
         //let's register our service in program.cs class 
     }
