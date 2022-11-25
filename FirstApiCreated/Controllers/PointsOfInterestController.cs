@@ -123,10 +123,12 @@ namespace FirstApiCreated.Controllers
             var checkcity = await _cityInfoRepository.isCityExist(cityid); 
             if (!checkcity) { return NotFound(); }
             //check point of interest Id
-            var checkpointofinterest =_cityInfoRepository.GetPointOfInterestAsync(cityid,pointofinterestid);
+            var checkpointofinterest = await _cityInfoRepository.GetPointOfInterestAsync(cityid,pointofinterestid);
             if (checkpointofinterest == null) { return NotFound(); }
             // i have problem here task<pointofinterest> and type pointofinterest are not the same 
+            // finally the problem is gone thanks to adding await keyword to the checkpointofinterest !! can you believe the importance of await !! 
             _cityInfoRepository.DeletePointofInterest(checkpointofinterest);
+           await  _cityInfoRepository.Savechangesasync();
             _mailSerive.Send("point of interest deleted ", $"point of interest {checkpointofinterest.Name} was deleted with id {checkpointofinterest.Id}");
             return NoContent();
 
