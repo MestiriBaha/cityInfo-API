@@ -28,6 +28,29 @@ namespace FirstApiCreated.Services
             }
             return await _cityInfoContext.Cities.Where(search => search.CityId == cityid).FirstOrDefaultAsync();
         }
+        // the filter method ! 
+        public async Task<IEnumerable<City>> FilteringCitiesAsync ( String? name , String? searchquery)
+        {
+            if ( String.IsNullOrEmpty(name) && (string.IsNullOrWhiteSpace(searchquery) ))
+            {
+                return await GetCitiesAsync();
+            }
+            //weird code here : 
+            // we create a queryable collection 
+            var collection = _cityInfoContext.Cities as IQueryable<City>;
+            if (!String.IsNullOrWhiteSpace(name))
+            {
+                string index = name.Trim()  ;
+                 collection =  collection.Where(search => search.Name == index) ;
+            }
+            if (!String.IsNullOrWhiteSpace(searchquery))
+            {
+                searchquery = searchquery.Trim() ;  
+                collection=collection.Where(search => search.Name.Contains( searchquery) || (search.Description!=null && search.Description.Contains(searchquery))) ; 
+            }
+            return await collection.OrderBy(final => final.Name).ToListAsync() ;
+
+        }
         public async Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityid)
         {
            // throw new NotImplementedException();

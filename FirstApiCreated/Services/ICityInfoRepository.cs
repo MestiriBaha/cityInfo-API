@@ -15,6 +15,9 @@ namespace FirstApiCreated.Services
         Task<Boolean> Savechangesasync();
         //delete method 
         void DeletePointofInterest(PointOfInterest pointOfInterest);
+        //filter 
+        Task<IEnumerable<City>> FilteringCitiesAsync(String? name , string? searchquery);
+
 
     }
 }

@@ -23,9 +23,9 @@ namespace FirstApiCreated.Controllers
         }
     
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CityWithoutPointOfInterestDTO>>> Getcities()
+        public async Task<ActionResult<IEnumerable<CityWithoutPointOfInterestDTO>>> Getcities(String? name , String? searchQuery )
         {
-            var cities = await _cityInfoRepository.GetCitiesAsync();
+            var cities = await _cityInfoRepository.FilteringCitiesAsync(name,searchQuery) ; 
             IList<CityWithoutPointOfInterestDTO> result = new List<CityWithoutPointOfInterestDTO>();
             //look how easy is Mapping !! 
             return Ok(_mapper.Map<IEnumerable<CityWithoutPointOfInterestDTO>>(cities));
