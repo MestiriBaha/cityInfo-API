@@ -125,6 +125,7 @@ namespace FirstApiCreated.Controllers
             //check point of interest Id
             var checkpointofinterest =_cityInfoRepository.GetPointOfInterestAsync(cityid,pointofinterestid);
             if (checkpointofinterest == null) { return NotFound(); }
+            // i have problem here task<pointofinterest> and type pointofinterest are not the same 
             _cityInfoRepository.DeletePointofInterest(checkpointofinterest);
             _mailSerive.Send("point of interest deleted ", $"point of interest {checkpointofinterest.Name} was deleted with id {checkpointofinterest.Id}");
             return NoContent();
