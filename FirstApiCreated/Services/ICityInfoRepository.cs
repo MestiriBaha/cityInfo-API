@@ -16,7 +16,7 @@ namespace FirstApiCreated.Services
         //delete method 
         void DeletePointofInterest(PointOfInterest pointOfInterest);
         //filter 
-        Task<IEnumerable<City>> FilteringCitiesAsync(String? name , string? searchquery);
+        Task<(IEnumerable<City> , PaginationMetadata)> FilteringCitiesAsync(String? name , string? searchquery,int pagesize , int pagenumber);
 
 
     }

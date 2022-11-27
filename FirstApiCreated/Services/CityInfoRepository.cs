@@ -29,12 +29,12 @@ namespace FirstApiCreated.Services
             return await _cityInfoContext.Cities.Where(search => search.CityId == cityid).FirstOrDefaultAsync();
         }
         // the filter method ! 
-        public async Task<IEnumerable<City>> FilteringCitiesAsync ( String? name , String? searchquery)
+        public async Task<(IEnumerable<City>, PaginationMetadata)> FilteringCitiesAsync ( String? name , String? searchquery,int pagesize , int pagenumber)
         {
-            if ( String.IsNullOrEmpty(name) && (string.IsNullOrWhiteSpace(searchquery) ))
-            {
-                return await GetCitiesAsync();
-            }
+            //if ( String.IsNullOrEmpty(name) && (string.IsNullOrWhiteSpace(searchquery) ))
+            //{
+            //    return await GetCitiesAsync();
+            //}
             //weird code here : 
             // we create a queryable collection 
             var collection = _cityInfoContext.Cities as IQueryable<City>;
@@ -48,7 +48,13 @@ namespace FirstApiCreated.Services
                 searchquery = searchquery.Trim() ;  
                 collection=collection.Where(search => search.Name.Contains( searchquery) || (search.Description!=null && search.Description.Contains(searchquery))) ; 
             }
-            return await collection.OrderBy(final => final.Name).ToListAsync() ;
+            var count = await collection.CountAsync();
+            var paginationmetadata = new PaginationMetadata(count, pagenumber, pagesize);
+            var collectiontoreturn =  await collection.OrderBy(final => final.Name)
+                .Skip(pagesize*(pagenumber-1))
+                .Take(pagesize)
+                .ToListAsync() ;
+            return (collectiontoreturn, paginationmetadata);    
 
         }
         public async Task<IEnumerable<PointOfInterest>> GetPointsOfInterestForCityAsync(int cityid)

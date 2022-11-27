@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using FirstApiCreated.Services ;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using System.Text.Json;
 
 namespace FirstApiCreated.Controllers
 {
@@ -12,6 +13,7 @@ namespace FirstApiCreated.Controllers
     public class citiesController : ControllerBase
 
     {
+        int maximumpagesize = 20;
         //let 's get rid from the static data 
         // inject the Automapper Profile service 
         private readonly ICityInfoRepository _cityInfoRepository;
@@ -23,11 +25,17 @@ namespace FirstApiCreated.Controllers
         }
     
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CityWithoutPointOfInterestDTO>>> Getcities(String? name , String? searchQuery )
+        public async Task<ActionResult<IEnumerable<CityWithoutPointOfInterestDTO>>> Getcities(String? name , String? searchQuery , int pagesize=10 , int pagenumber=1 )
         {
-            var cities = await _cityInfoRepository.FilteringCitiesAsync(name,searchQuery) ; 
-            IList<CityWithoutPointOfInterestDTO> result = new List<CityWithoutPointOfInterestDTO>();
+            if (pagesize > maximumpagesize)
+            {
+                pagesize = maximumpagesize ;
+            }
+            var (cities,metadata) = await _cityInfoRepository.FilteringCitiesAsync(name,searchQuery,pagesize,pagenumber) ;
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(metadata));
+           //  IList<CityWithoutPointOfInterestDTO> result = new List<CityWithoutPointOfInterestDTO>();
             //look how easy is Mapping !! 
+
             return Ok(_mapper.Map<IEnumerable<CityWithoutPointOfInterestDTO>>(cities));
         }
         [HttpGet("{id}")]
