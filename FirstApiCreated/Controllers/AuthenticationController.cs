@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace FirstApiCreated.Controllers
 {
@@ -7,6 +11,8 @@ namespace FirstApiCreated.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
+
         // highly sensitive class !! for security measures !! 
         public class AuthenticationRequestBody
         {
@@ -30,15 +36,44 @@ namespace FirstApiCreated.Controllers
                 City = city;
             }
         }
+        
+        public AuthenticationController (IConfiguration configuration)
+        {
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        }
         [HttpPost("authenticate")]
-        public ActionResult<String> authenticate(AuthenticationRequestBody authentication)
+       public ActionResult<String> authenticate(AuthenticationRequestBody authentication)
         {
             // validate the username/paasword  
-            var usercredentials = ValidateUsercredentials(authentication.UserName, authentication.Password);
-            if (usercredentials == null)
+            var user = ValidateUsercredentials(authentication.UserName, authentication.Password);
+            if (user == null)
             {
                 return Unauthorized();  
             }
+            // create the Token  : always pay attention for the configuration string !! 
+            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["Authentication:SecretForKey"] ) ) ;
+            var signingCredentials = new SigningCredentials(securityKey,SecurityAlgorithms.HmacSha256) ;
+            // the claims that : 
+            var claimsforToken = new List<Claim>();
+                claimsforToken.Add(new Claim("sub", user.UserId.ToString()));
+            claimsforToken.Add(new Claim("given_name ", user.FirstName));
+            claimsforToken.Add(new Claim("family_name", user.LastName));
+            claimsforToken.Add(new Claim("city ", user.City));
+            //finally : creation of the Token 
+            var JwtsecurityToken = new JwtSecurityToken(
+                _configuration["Authentication:Issuer"],
+                _configuration["Authentication:Audience"],
+                claimsforToken,
+                DateTime.UtcNow,
+                DateTime.UtcNow.AddHours(1),
+                signingCredentials
+                );
+            // write the Token 
+            var TokentoReturn = new JwtSecurityTokenHandler().WriteToken(JwtsecurityToken);
+
+            return Ok(TokentoReturn);   
+
+
 
         }
 
