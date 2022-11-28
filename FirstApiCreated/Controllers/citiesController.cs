@@ -4,11 +4,13 @@ using FirstApiCreated.Services ;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FirstApiCreated.Controllers
 {
     
     [ApiController]
+    [Authorize]
     [Route("api/[Controller]")]
     public class citiesController : ControllerBase
 
